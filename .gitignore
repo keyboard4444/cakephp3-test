@@ -3,3 +3,9 @@ tmp/
 tests/
 bin/
 logs/
+
+.editorconfig
+.gitattributes
+.github/
+.htaccess
+.travis.yml
