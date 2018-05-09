@@ -1,0 +1,5 @@
+vendor/
+tmp/
+tests/
+bin/
+logs/
