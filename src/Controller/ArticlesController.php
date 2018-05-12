@@ -125,6 +125,12 @@ class ArticlesController extends AppController
         $this->render(DS.'blank');
     }
     
+    /**
+     * 
+     */
+    public function tryprefix(){
+        
+    }
     
     /**
      * Manually specify which .ctp file to be render as view
@@ -187,6 +193,19 @@ class ArticlesController extends AppController
     }
     
     /**
+     * double trailing start at routes "/verygreed/**"
+     * 
+     * "cakephp3-test/verygreed/lol" and see the result
+     * then change "...$random_data" into "$random_data" to see the differences
+     */
+    public function doubletrailstarroute(...$random_data){
+        
+        pr($random_data);
+        
+        $this->render(DS.'blank');
+    }
+    
+    /**
      * from fixed url, you can pass default data
      */
     public function passme( $special_data=null){
@@ -196,6 +215,13 @@ class ArticlesController extends AppController
         $this->render(DS.'blank');
     }
     
+    /**
+     * 
+     */
+    public function commonrouting($special_data){
+        
+        pr($special_data);
+    }
     
     public function display()
     {

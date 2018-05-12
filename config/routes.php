@@ -43,6 +43,36 @@ use Cake\Routing\Route\DashedRoute;
  */
 Router::defaultRouteClass(DashedRoute::class);
 
+/**
+ * prefix routing
+ * 
+ * http://localhost/cakephp3-test/admin/... will goes here
+ */
+Router::prefix('admin', function ($routes) {
+    
+    $routes->connect('/', ['controller' => 'Pages', 'action' => 'index']);
+    
+    $routes->fallbacks(DashedRoute::class);
+});
+
+
+/**
+ * A common use for routing = rename controllers and their actions
+ * This is good if you want URL something like "/members/" but the the MVC is Users
+ * 
+ * Try type "http://localhost/cakephp3-test/cooks/commonrouting/i LIKE cakePHP/and i CANNOT lie"
+ * 
+ * Another example is lowercase + dashify
+ */
+$routes->scope('/cooks', function ($routes) {
+    
+    $routes->setRouteClass(DashedRoute::class); //lowercased and dashed URLs when you generate the URL using html->link <-- this one not working or am i missing something?
+    
+    $routes->connect(
+        '/:action/*', ['controller' => 'Articles']
+    )->setPatterns(['id' => '[0-9]+']);
+});
+
 
 /**
  * set default controller to all "connect(...)" inside it to use "Articles"
@@ -63,6 +93,14 @@ Router::scope('/arty', ['controller' => 'Articles'], function ($routes) {
 
 Router::scope('/', function (RouteBuilder $routes) {
     
+//    $routes->setRouteClass(DashedRoute::class);
+//    $routes->connect('/:controller/:id', ['action' => 'view'])->setPatterns(['id' => '[0-9]+']);
+    
+    //double trail star route
+    $routes->connect(
+        '/verygreed/**',
+        ['controller' => 'Articles', 'action' => 'doubletrailstarroute', 'send_default_variable_here']
+    );
     
     $routes->connect('/', ['controller' => 'Articles', 'action' => 'display']);
     $routes->connect('/articles', ['controller' => 'Articles', 'action' => 'display']);

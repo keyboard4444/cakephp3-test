@@ -3,6 +3,7 @@ tmp/
 tests/
 bin/
 logs/
+config/.env
 
 .editorconfig
 .gitattributes
