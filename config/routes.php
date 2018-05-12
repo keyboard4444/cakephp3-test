@@ -55,7 +55,6 @@ Router::prefix('admin', function ($routes) {
     $routes->fallbacks(DashedRoute::class);
 });
 
-
 /**
  * A common use for routing = rename controllers and their actions
  * This is good if you want URL something like "/members/" but the the MVC is Users
@@ -91,8 +90,26 @@ Router::scope('/arty', ['controller' => 'Articles'], function ($routes) {
 });
 
 
+//not working
+//connect to plugin https://book.cakephp.org/3.0/en/plugins.html#plugin-routes
+//$routes->scope('/backend', function ($routes) { 
+//    $routes->loadPlugin('ContactManager');
+//});
+//Router::plugin('ContactManager', ['path' => '/backend'], function ($routes) {
+//    // Routes connected here are prefixed with '/debug_kit' and
+//    // have the plugin route element set to 'DebugKit'.
+////    $routes->connect('/:controller');
+//});
+
+
 Router::scope('/', function (RouteBuilder $routes) {
     
+    //not working
+//    $routes->scope('/backend', function ($routes) {
+//        $routes->loadPlugin('ContactManager');
+//    });
+
+
 //    $routes->setRouteClass(DashedRoute::class);
 //    $routes->connect('/:controller/:id', ['action' => 'view'])->setPatterns(['id' => '[0-9]+']);
     
