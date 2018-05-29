@@ -3,10 +3,87 @@
 
 namespace App\Controller;
 use Cake\Routing\Router;
+use Cake\ORM\TableRegistry;
 
 
 class ArticlesController extends AppController
 {
+    /**
+     * study query builder tutorial at https://book.cakephp.org/3.0/en/orm/query-builder.html
+     */
+    public function studyquerybuilder(){
+        
+        /*$articles = TableRegistry::get('Articles'); //need to "use Cake\ORM\TableRegistry;" to use this
+        $query = $articles->find()->first();
+        pj($query);*/
+        
+        
+        //sample of using find
+        /*$query = $this->Articles
+            ->find()
+            ->select(['id', 'user_id', 'title', 'slug'])
+            ->where(['id !=' => 1])
+            ->order(['created' => 'DESC'])
+            ->limit(3);
+        pj($query);*/
+        
+        //there is differences between limit(1) and first()
+        /*$query = $this->Articles
+            ->find()
+            ->select(['id', 'user_id', 'title', 'slug'])
+            ->where(['id !=' => 1])
+            ->order(['created' => 'DESC'])
+            ->first();
+        pj($query);*/
+        
+        
+        /**
+         * comparing differences between find using
+         * ... (none)   = Return ORM-Query Object
+         * all()        = Return ORM-ResultSet Object + Return Items->0->name
+         * toList()     = Return ORM-ResultSet Object + Return [0]->name
+         * toArray()    = Return ORM-ResultSet Object + Return [0]->name
+         */
+        /*$this->loadModel("Contacts");
+        $query = $this->Contacts
+            ->find()
+            ->where(['id >=' => 1]);
+        pr("==========BLANK");
+        //pr($query);
+        //pj($query);
+        
+        $query = $this->Contacts
+            ->find()
+            ->where(['Contacts.id >=' => 1])
+            ->contain(['Users'])
+            ->all();
+        pr("==========ALL");
+//        pr($query);
+//        pj($query);
+        
+        $query = $this->Contacts
+            ->find()
+            ->where(['Contacts.id >=' => 1])
+            ->contain(['Users'])
+            ->toList();
+        pr("==========TO LIST");
+//        pr($query);
+//        pj($query);
+//        $query[0]->name;
+//        $query[0]['name'];
+        
+        $query = $this->Contacts
+            ->find()
+            ->where(['Contacts.id >=' => 1])
+            ->contain(['Users'])
+            ->toArray();
+        pr("==========TO ARRAY");
+//        pr($query);
+//        pj($query);
+//        $query[0]->name;
+//        $query[0]['name'];
+        */
+    }
     
     /**
      * reading the differences between cakephp2 and cakephp3 ORM here "Find returns a Query Object" https://book.cakephp.org/3.0/en/appendices/orm-migration.html
