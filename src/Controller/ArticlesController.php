@@ -8,10 +8,25 @@ use Cake\ORM\TableRegistry;
 
 class ArticlesController extends AppController
 {
+    /*
+     * study cakephp collection: https://book.cakephp.org/3.0/en/core-libraries/collections.html
+     */
+    public function studycollection(){
+        
+        
+        
+        
+        
+        $this->render(DS.'blank');
+    }
+    
     /**
      * study query builder tutorial at https://book.cakephp.org/3.0/en/orm/query-builder.html
      */
     public function studyquerybuilder(){
+        
+        $this->loadModel("Contacts");
+        
         
         /*$articles = TableRegistry::get('Articles'); //need to "use Cake\ORM\TableRegistry;" to use this
         $query = $articles->find()->first();
@@ -40,17 +55,17 @@ class ArticlesController extends AppController
         /**
          * comparing differences between find using
          * ... (none)   = Return ORM-Query Object
-         * all()        = Return ORM-ResultSet Object + Return Items->0->name
-         * toList()     = Return ORM-ResultSet Object + Return [0]->name
-         * toArray()    = Return ORM-ResultSet Object + Return [0]->name
+         * all()        = Return ORM-ResultSet Object   + Return Items->0->name
+         * toList()     = Return Entity Object  + Return [0]->name
+         * toArray()    = Return Entity Object  + Return [0]->name
+         * first()      = Return Entity Object  + 
          */
-        /*$this->loadModel("Contacts");
-        $query = $this->Contacts
+        /*$query = $this->Contacts
             ->find()
             ->where(['id >=' => 1]);
         pr("==========BLANK");
-        //pr($query);
-        //pj($query);
+//        pr($query);
+//        pj($query);
         
         $query = $this->Contacts
             ->find()
@@ -83,6 +98,38 @@ class ArticlesController extends AppController
 //        $query[0]->name;
 //        $query[0]['name'];
         */
+        
+        
+        //Selecting A Single Row From A Table VS select using LIMIT=1
+        /*$query = $this->Contacts
+            ->find()
+            ->where(['Contacts.id >=' => 1])
+            ->first();
+        pr("==========Selecting A Single Row From A Table");
+        pr($query);
+        pj($query);
+        pr($query->name);
+        
+        $query = $this->Contacts
+            ->find()
+            ->where(['Contacts.id >=' => 1])
+            ->limit(1)
+            ->toArray();
+        pr("==========Selecting using limit and toArray");
+        pr($query);
+        pj($query);
+        pr($query[0]->name);*/
+        
+        
+        //Getting A List Of Values From A Column
+        //https://book.cakephp.org/3.0/en/orm/query-builder.html#getting-a-list-of-values-from-a-column
+        $data1 = $this->Contacts->find()->extract('name');
+        pr($data1); //Return Collection-Iterator-ExtractIterator Object
+        pj($data1);
+        
+        
+        //STOP AT: https://book.cakephp.org/3.0/en/orm/query-builder.html#getting-a-list-of-values-from-a-column
+        //Later continue
     }
     
     /**
@@ -171,13 +218,15 @@ class ArticlesController extends AppController
         pr(json_encode($data1, JSON_PRETTY_PRINT));
         
         
-        //TEST6
+        //TEST6 : https://book.cakephp.org/3.0/en/appendices/orm-migration.html#finder-method-changes
         //using Finder Method Changes aka ->find('mycustomfinder')
         //you can also make extra conditions on top of your custom finder
 //        $data1 = $this->Articles->find('mycustomfinder')->where([
 //            'id <=' => 10
 //        ]);
 //        pr(json_encode($data1, JSON_PRETTY_PRINT));
+        //you can also chain find() multiple times
+        //eg: find('custom1')->find('custom2')
         
         
         //TEST7
@@ -190,13 +239,14 @@ class ArticlesController extends AppController
         //5. https://book.cakephp.org/3.0/en/orm/retrieving-data-and-resultsets.html
         
         
-        //TEST8
+        //TEST8 : https://book.cakephp.org/3.0/en/appendices/orm-migration.html#no-afterfind-event-or-virtual-fields
         //virtual field replace by ENTITIES
         $data1 = $this->Articles->get(2);
         pr($data1->title_slug);
         pr(json_encode($data1, JSON_PRETTY_PRINT));
         
         
+        //LATER CONTINUE FROM: https://book.cakephp.org/3.0/en/appendices/orm-migration.html#no-afterfind-event-or-virtual-fields
         
         
         $this->render(DS.'blank');
