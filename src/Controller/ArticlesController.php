@@ -4,7 +4,7 @@
 namespace App\Controller;
 use Cake\Routing\Router;
 use Cake\ORM\TableRegistry;
-
+//use Cake\Collection\Collection;
 
 class ArticlesController extends AppController
 {
@@ -13,8 +13,58 @@ class ArticlesController extends AppController
      */
     public function studycollection(){
         
+        //in order to use collection, you need to "use Cake\Collection\Collection" first
+        //Note that collection has 2 .php file, the CollectionTraits and CollectionInterface
+        
+        //Quick Example https://book.cakephp.org/3.0/en/core-libraries/collections.html#quick-example
+        $items = ['a' => 1, 'b' => 2, 'c' => 3];
+//        $collection = new Collection($items); //if you use this, you need to "use Cake\Collection\Collection;"
+        $collection = collection($items); //while for this, you dont need to "use Cake\Collection\Collection;"
+
+        // Create a new collection containing elements
+        // with a value greater than one.
+        pr("============FIRST EXAMPLE");
+        $overOne = $collection->filter(function ($value, $key, $iterator) {
+            return $value > 1;
+        });
+        pr($overOne); //return Collection-Iterator-FilterIterator Object
+        pr($overOne->toArray()); //can see the results here
         
         
+        //Iterating https://book.cakephp.org/3.0/en/core-libraries/collections.html#iterating
+        /*pr("============Iterating");
+        $collection = collection($items);
+        $test1 = [];
+        $test1 = $collection->each(function ($value, $key) {
+            return $value * 2;
+        });
+        pr($collection->toArray());
+        pr($test1->toArray());*/
+        
+        //using map
+        pr("============Iterating using MAP");
+        $collection = collection($items);
+        $test1 = [];
+        $test1 = $collection->map(function ($value, $key) {
+            return $value * 2;
+        });
+        pr($collection->toArray());
+        pr($test1->toArray()); //you can see the differences between toList() and toArray() here
+        pr($test1->toList());
+        
+        
+        //TO BE CONTINUE: STUDY start from "Cake\Collection\Collection::extract"
+        
+        
+        $this->loadModel("Contacts");
+        
+        //use this as base data shall we
+        pr("============Sample data");
+        $query = $this->Contacts
+            ->find()
+            ->where(['Contacts.id >=' => 1])
+            ->contain(['Users']);
+        //pj($query);
         
         
         $this->render(DS.'blank');
@@ -164,45 +214,53 @@ class ArticlesController extends AppController
         
         //TEST3
         //using formatResults
-//        $data1 = $this->Articles->find()
-//            ->order(['title' => 'DESC'])
-//            ->formatResults(function (\Cake\Collection\CollectionInterface $results) {
-                
-                //TEST3.1
-                //default way of doing things
-//                return $results->extract('title');
-                
-                //TEST3.2
-                //separate the title and slug into different key-group
-                //hard to explain, just see the results
-//                return array(
-//                    $results->extract('title'), $results->extract('slug')
-//                );
-                
-                //TEST3.3
-                //set the result array key to use slug instead of standard array key-counter
-                //we can also use indexBy('id') which is really cool
-//                return $results->indexBy('slug');
-                
-                //TEST3.4
-                //we can customize additional logic and decide what we want to return
-                //but this also can be done using ENTITIES (access OR _get(...))
-//                return $results->map(function ($row) {
-//                    $new_row = array();
-//                    
-//                    $new_row['title'] = $row['title'];
-//                    $new_row['slug'] = $row['slug'];
-//                    $new_row['published'] = $row['published'];
-//                    
-//                    $new_row['txt_published'] = "PUBLISHED";
-//                    if( $new_row['published']===FALSE){
-//                        $new_row['txt_published'] = "NOT YET PUBLISHED";
-//                    }
-//                    
-//                    return $new_row;
-//                });
-//        });
-//        pr(json_encode($data1, JSON_PRETTY_PRINT));
+        if( TRUE){
+            $data1 = $this->Articles->find()
+                ->order(['title' => 'DESC'])
+                ->formatResults(function (\Cake\Collection\CollectionInterface $results) {
+
+                    //TEST3.1
+                    //default way of doing things
+                    return $results->extract('title');
+
+                    //TEST3.2
+                    //separate the title and slug into different key-group
+                    //hard to explain, just see the results
+    //                return array(
+    //                    $results->extract('title'), $results->extract('slug')
+    //                );
+
+                    //TEST3.3
+                    //set the result array key to use slug instead of standard array key-counter
+                    //we can also use indexBy('id') which is really cool
+    //                return $results->indexBy('slug');
+
+                    //TEST3.4
+                    //we can customize additional logic and decide what we want to return
+                    //but this also can be done using ENTITIES (access OR _get(...))
+    //                return $results->map(function ($row) {
+    //                    $new_row = array();
+    //                    
+    //                    $new_row['title'] = $row['title'];
+    //                    $new_row['slug'] = $row['slug'];
+    //                    $new_row['published'] = $row['published'];
+    //                    
+    //                    $new_row['txt_published'] = "PUBLISHED";
+    //                    if( $new_row['published']===FALSE){
+    //                        $new_row['txt_published'] = "NOT YET PUBLISHED";
+    //                    }
+    //                    
+    //                    return $new_row;
+    //                });
+    //                
+                    //TEST3.5
+                    //since we know index and extract, we can also chain their results like below
+    //                return $results->indexBy('slug')->extract('title');
+            });
+            pr(json_encode($data1, JSON_PRETTY_PRINT));
+            pr($data1->toArray());
+            pr($data1->toList());
+        }
         
         
         //TEST4
@@ -214,8 +272,8 @@ class ArticlesController extends AppController
         
         //TEST5
         //find first is remove, plus we got cooler way which is get
-        $data1 = $this->Articles->get(2);
-        pr(json_encode($data1, JSON_PRETTY_PRINT));
+//        $data1 = $this->Articles->get(2);
+//        pr(json_encode($data1, JSON_PRETTY_PRINT));
         
         
         //TEST6 : https://book.cakephp.org/3.0/en/appendices/orm-migration.html#finder-method-changes
@@ -241,9 +299,9 @@ class ArticlesController extends AppController
         
         //TEST8 : https://book.cakephp.org/3.0/en/appendices/orm-migration.html#no-afterfind-event-or-virtual-fields
         //virtual field replace by ENTITIES
-        $data1 = $this->Articles->get(2);
-        pr($data1->title_slug);
-        pr(json_encode($data1, JSON_PRETTY_PRINT));
+//        $data1 = $this->Articles->get(2);
+//        pr($data1->title_slug);
+//        pr(json_encode($data1, JSON_PRETTY_PRINT));
         
         
         //LATER CONTINUE FROM: https://book.cakephp.org/3.0/en/appendices/orm-migration.html#no-afterfind-event-or-virtual-fields
