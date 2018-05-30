@@ -16,55 +16,138 @@ class ArticlesController extends AppController
         //in order to use collection, you need to "use Cake\Collection\Collection" first
         //Note that collection has 2 .php file, the CollectionTraits and CollectionInterface
         
-        //Quick Example https://book.cakephp.org/3.0/en/core-libraries/collections.html#quick-example
+        $this->loadModel("Contacts");
         $items = ['a' => 1, 'b' => 2, 'c' => 3];
-//        $collection = new Collection($items); //if you use this, you need to "use Cake\Collection\Collection;"
-        $collection = collection($items); //while for this, you dont need to "use Cake\Collection\Collection;"
+        
+        //Quick Example https://book.cakephp.org/3.0/en/core-libraries/collections.html#quick-example
+        if( FALSE){
+    //        $collection = new Collection($items); //if you use this, you need to "use Cake\Collection\Collection;"
+            $collection = collection($items); //while for this, you dont need to "use Cake\Collection\Collection;"
 
-        // Create a new collection containing elements
-        // with a value greater than one.
-        pr("============FIRST EXAMPLE");
-        $overOne = $collection->filter(function ($value, $key, $iterator) {
-            return $value > 1;
-        });
-        pr($overOne); //return Collection-Iterator-FilterIterator Object
-        pr($overOne->toArray()); //can see the results here
+            // Create a new collection containing elements
+            // with a value greater than one.
+            pr("============FIRST EXAMPLE");
+            $overOne = $collection->filter(function ($value, $key, $iterator) {
+                return $value > 1;
+            });
+            pr($overOne); //return Collection-Iterator-FilterIterator Object
+            pr($overOne->toArray()); //can see the results here
+        }
         
         
         //Iterating https://book.cakephp.org/3.0/en/core-libraries/collections.html#iterating
-        /*pr("============Iterating");
-        $collection = collection($items);
-        $test1 = [];
-        $test1 = $collection->each(function ($value, $key) {
-            return $value * 2;
-        });
-        pr($collection->toArray());
-        pr($test1->toArray());*/
+        if( FALSE){
+            /*pr("============Iterating");
+            $collection = collection($items);
+            $test1 = [];
+            $test1 = $collection->each(function ($value, $key) {
+                return $value * 2;
+            });
+            pr($collection->toArray());
+            pr($test1->toArray());*/
+
+            //using map
+            pr("============Iterating using MAP");
+            $collection = collection($items);
+            $test1 = [];
+            $test1 = $collection->map(function ($value, $key) {
+                return $value * 2;
+            });
+            pr($collection->toArray());
+            pr($test1->toArray()); //you can see the differences between toList() and toArray() here
+            pr($test1->toList());
+        }
         
-        //using map
-        pr("============Iterating using MAP");
-        $collection = collection($items);
-        $test1 = [];
-        $test1 = $collection->map(function ($value, $key) {
-            return $value * 2;
-        });
-        pr($collection->toArray());
-        pr($test1->toArray()); //you can see the differences between toList() and toArray() here
-        pr($test1->toList());
+        
+        if( TRUE){
+            pr("============sample raw data");
+            $query = $this->Contacts
+                ->find()
+                ->where(['Contacts.id >=' => 1])
+                ->contain(['Users'])
+                ->toArray('name');
+            pj($query);
+        }
         
         
-        //TO BE CONTINUE: STUDY start from "Cake\Collection\Collection::extract"
+        //"Cake\Collection\Collection::extract"
+        if( FALSE){
+            pr("============Extract 1"); //get id-name mapping
+            $data1 = $this->Contacts
+                ->find()
+                ->where(['Contacts.id >=' => 1])
+                ->contain(['Users'])
+                ->indexBy('id')
+                ->extract('name')
+                ->toArray();
+            pr($data1);
+        }    
+            
+        if( FALSE){
+            pr("============Extract 2"); //get id-name mapping but index and extract later
+            $data1 = $this->Contacts
+                ->find()
+                ->where(['Contacts.id >=' => 1])
+                ->contain(['Users']);
+            $data2 = $data1->indexBy('id')->extract('name')->toArray();
+            pr($data2);
+            
+            //another experiment
+            $data2 = $data1->map(function ($row) {
+                    $new_row = array();
+                    $new_row['id'] = $row['id'];
+                    $new_row['name'] = $row['name'];
+                    $new_row['age'] = $row['age'];
+                    return $new_row;
+                })
+                ->indexBy('id')
+                ->toArray();
+            pr($data2);
+            
+            //another experiment
+            $data2 = $data1->extract(function ($row) { //extract as callback
+                return [
+                    'id' => $row['id'], 
+                    'name' => $row['name'], 
+                    'age' => $row['age']
+                ];
+            })
+            ->indexBy('id')
+            ->toArray();
+            pr($data2);
+        }
         
+        if( FALSE){
+            pr("============Extract 4"); //extract and index is actually a callback function
+            $data1 = $this->Contacts
+                ->find()
+                ->contain(['Users']);
+            
+            $data2 = $data1->extract(function ($row) { //extract as callback
+                return $row['name'];
+            })->toArray();
+            pr($data2);
+            
+            $data2 = $data1->indexBy(function ($row) { //indexby as callback
+                return $row['name'];
+            })->extract('id')->toArray();
+            pr($data2);
+        }
         
-        $this->loadModel("Contacts");
-        
-        //use this as base data shall we
-        pr("============Sample data");
-        $query = $this->Contacts
-            ->find()
-            ->where(['Contacts.id >=' => 1])
-            ->contain(['Users']);
-        //pj($query);
+        if( TRUE){
+            pr("============Extract 3"); //get the mapping by sub
+            $data1 = $this->Contacts
+                ->find()
+                ->contain(['Users']);
+            
+            $data2 = $data1->indexBy('user.id')->extract('user.email')->toArray(); //index mapping by sub
+            pr($data2);
+            
+            $data2 = $data1->groupBy('user.id')->toArray(); //group by user_id, see 1 user_id has multiple contacts
+            pj($data2);
+            
+            
+        }
         
         
         $this->render(DS.'blank');
