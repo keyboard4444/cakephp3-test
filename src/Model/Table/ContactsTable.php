@@ -13,5 +13,6 @@ class ContactsTable extends Table
         
         
         $this->belongsTo('Users');
+        $this->hasMany('Articles');
     }
 }

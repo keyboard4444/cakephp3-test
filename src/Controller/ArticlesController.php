@@ -5,9 +5,13 @@ namespace App\Controller;
 use Cake\Routing\Router;
 use Cake\ORM\TableRegistry;
 //use Cake\Collection\Collection;
+use Cake\Datasource\ConnectionManager;
 
 class ArticlesController extends AppController
 {
+    
+    
+    
     /*
      * study cakephp collection: https://book.cakephp.org/3.0/en/core-libraries/collections.html
      */
@@ -20,7 +24,7 @@ class ArticlesController extends AppController
         $items = ['a' => 1, 'b' => 2, 'c' => 3];
         
         //Quick Example https://book.cakephp.org/3.0/en/core-libraries/collections.html#quick-example
-        if( FALSE){
+        if( 0){
     //        $collection = new Collection($items); //if you use this, you need to "use Cake\Collection\Collection;"
             $collection = collection($items); //while for this, you dont need to "use Cake\Collection\Collection;"
 
@@ -36,7 +40,7 @@ class ArticlesController extends AppController
         
         
         //Iterating https://book.cakephp.org/3.0/en/core-libraries/collections.html#iterating
-        if( FALSE){
+        if( 0){
             /*pr("============Iterating");
             $collection = collection($items);
             $test1 = [];
@@ -59,19 +63,19 @@ class ArticlesController extends AppController
         }
         
         
-        if( TRUE){
+        if( 0){
             pr("============sample raw data");
             $query = $this->Contacts
                 ->find()
                 ->where(['Contacts.id >=' => 1])
-                ->contain(['Users'])
+                ->contain(['Users', 'Articles'])
                 ->toArray('name');
             pj($query);
         }
         
         
         //"Cake\Collection\Collection::extract"
-        if( FALSE){
+        if( 0){
             pr("============Extract 1"); //get id-name mapping
             $data1 = $this->Contacts
                 ->find()
@@ -83,7 +87,7 @@ class ArticlesController extends AppController
             pr($data1);
         }    
             
-        if( FALSE){
+        if( 0){
             pr("============Extract 2"); //get id-name mapping but index and extract later
             $data1 = $this->Contacts
                 ->find()
@@ -117,7 +121,7 @@ class ArticlesController extends AppController
             pr($data2);
         }
         
-        if( FALSE){
+        if( 0){
             pr("============Extract 4"); //extract and index is actually a callback function
             $data1 = $this->Contacts
                 ->find()
@@ -134,7 +138,7 @@ class ArticlesController extends AppController
             pr($data2);
         }
         
-        if( TRUE){
+        if( 0){
             pr("============Extract 3"); //get the mapping by sub
             $data1 = $this->Contacts
                 ->find()
@@ -145,11 +149,145 @@ class ArticlesController extends AppController
             
             $data2 = $data1->groupBy('user.id')->toArray(); //group by user_id, see 1 user_id has multiple contacts
             pj($data2);
-            
-            
         }
         
+        if( 0){
+            pr("============Extract 5"); //as per tutorial, using {*} to retrieve nested
+            $data1 = $this->Contacts
+                ->find()
+                ->contain(['Users', 'Articles']);
+            
+            $data2 = $data1->extract('articles.{*}.slug')->toArray(); //index mapping by sub
+            pr($data2);
+        }
         
+        if( 0){
+            pr("============Combine"); //create a new collection made from keys and values in an existing collection. Both the key and value paths can be specified with dot notation path
+            $data1 = $this->Contacts
+                ->find()
+                ->contain(['Users', 'Articles']);
+            
+//            $data2 = $data1->toArray();
+//            pj($data2);
+            
+            $data2 = $data1->combine('id', 'name')->toArray();
+            pr($data2);
+            
+            $data2 = $data1->combine('id', 'name', 'user_id')->toArray();
+            pr($data2);
+        }
+        
+        if( 0){
+            pr("============Unfold"); //as per tutorial
+            
+            //standard example
+            if( 0){
+                $items = [[1, 2, 3], [4, 5]];
+                $collection = collection($items);
+                $new = $collection->unfold();
+                pr($new->toArray());
+            }
+            
+            //
+            if( 0){
+                
+                //raw data
+                $data1 = $this->Contacts
+                    ->find()
+                    ->contain(['Users']);
+                
+                //
+                $data2 = $data1->combine('id', 'name', 'user_id')->toArray();
+                pr($data2);
+                $data3 = collection($data2); //somehow unfold(...) cannot be chain
+                pr($data3->unfold()->toArray());
+                
+                //
+                $oddNumbers = [1, 3, 5, 7];
+                $collection = collection($oddNumbers);
+                $new = $collection->unfold(function ($oddNumber) {
+                    yield $oddNumber;
+                    yield $oddNumber + 1;
+                });
+                $result = $new->toList();
+                pr($result);
+            }
+        }
+            
+        if( 1) {
+            pr("============chunk"); //as per tutorial
+            
+            //as per tutorial
+            if (0) {
+                $items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+                $collection = collection($items);
+                $chunked = $collection->chunk(2);
+                pr($chunked->toList());
+            }
+            
+            $data1 = $this->Articles->find();
+            
+            //record set can also be chunk
+            if (0) {
+                $data2 = $data1->chunk(2);
+                pj($data2);
+            }
+            
+            //as per tutorial, batch processing
+            if (0) {
+                $data2 = $data1->map(function ($article) {
+                    $article->test = 'hello';
+                    return $article;
+                })
+                ->chunk(4)
+                ->each(function ($batch) {
+                    pj($batch);
+                });
+            }
+            
+            //chunk with keys, for associative arrays
+            if (1) {
+                
+                $data1 = $this->Articles->find()->where([
+                    'Articles.id >=' => 3
+                ]);
+            
+                //there is differences between chunk using toArray() and toList(), seems better using toList()
+                if( 0){
+                    $data2 = $data1->extract('slug');
+                    pr("===raw data");
+                    pr($data2->toArray());
+                    pr("===chunk->toArray");
+                    pr($data2->chunk(3)->toArray());
+                    pr("===chunk->toList");
+                    pr($data2->chunk(3)->toList());
+                    pr("===chunkWithKeys->toArray");
+                    pr($data2->chunkWithKeys(3)->toArray());
+                    pr("===chunkWithKeys->toList");
+                    pr($data2->chunkWithKeys(3)->toList());
+                }
+                
+                //compare differences with top and each others
+                if( 1){
+                    $data2 = $data1->indexBy('id')->extract('slug');
+                    pr("===raw data");
+                    pr($data2->toArray());
+                    pr("===chunk->toArray");
+                    pr($data2->chunk(3)->toArray());
+                    pr("===chunk->toList");
+                    pr($data2->chunk(3)->toList()); //best result but not preserve key
+                    pr("===chunkWithKeys->toArray");
+                    pr($data2->chunkWithKeys(3)->toArray());
+                    pr("===chunkWithKeys->toList");
+                    pr($data2->chunkWithKeys(3)->toList()); //best result to preserve key
+                }
+            }
+            
+            
+            //next thing to learn, https://book.cakephp.org/3.0/en/core-libraries/collections.html#filtering
+        }
+
+
         $this->render(DS.'blank');
     }
     
@@ -159,6 +297,157 @@ class ArticlesController extends AppController
     public function studyquerybuilder(){
         
         $this->loadModel("Contacts");
+        
+        
+        //ORM object is lazy, means the SQL is just prepared and not going to executed unless
+        if( FALSE){
+            
+            //this will not execute and SQL statements (can check with Cake Debug Kit - SQL Log)
+            $query = $this->Articles->find(); 
+            $query->select(['id', 'title', 'slug']);
+            $query->where(['Articles.id >=' => 1]);
+            $query->order(['Articles.id DESC']);
+            $query->enableHydration(false); //true return object, false return array
+            
+            //this one will not trigger execute, dont get confused
+//            pr($query);
+//            dd($query);
+            
+            //below this will trigger execute the SQL, possibly many more but below is what i know
+//            pj($query);
+//            $query->all();
+//            $query->toList();
+//            pr($query->toArray());
+//            $query->first();
+//            foreach($query as $key1 => $value1){}
+//            pr($query->extract('slug')->toArray());
+//            $query->execute();
+        }
+        
+        
+        //same like top, but try to do more advance query which learn from the API https://api.cakephp.org/3.6/class-Cake.ORM.Query.html
+        if( 1){
+            
+            $query = $this->Articles->find();
+            
+            //at the end of the query, there will be 'HELLO WORLD'
+//            $query->epilog('HELLO WORLD');
+            
+            //will do "SELECT Articles.id AS `helloworld`, ..." but somehow helloworld value cannot be retrieve
+//            $query->modifier(['Articles.id AS `helloworld`', ',']);
+            
+            //example of using QueryExpression
+            $myQueryExpression1 = $query->newExpr("SUM(Articles.id)");
+            //$myQueryExpression2 = $query->newExpr('CASE WHEN Articles.id > 3 THEN "The quantity is greater than 30" WHEN Articles.id <= 3 THEN "The quantity is 30" ELSE "The quantity is something else" END');
+            $query->select(['hiworld' => $myQueryExpression1]);
+            
+            //using alias, but not sure what is the purposes
+//            $query->select($query->aliasField('title', 'Articles'));
+            
+            //using alias, but not sure what is the purposes
+//            $query->select($query->aliasFields(['SUM(id)', 'title'], 'Articles'));
+            
+            //will not process the field type eg: created_date will not convert into FrozenTime Object
+//            $query->disableResultsCasting();
+            
+            //see what value has been set into "$query"
+//            $query->select(['id', 'title', 'slug']);
+//            pr($query->clause('select'));
+            
+            $data1 = $query->toArray();
+            pr($data1);
+        }
+        
+        
+        //some sample using raw sql, https://book.cakephp.org/3.0/en/orm/database-basics.html
+        if( 0){
+            
+            $connection = ConnectionManager::get('default'); //you need to "use Cake\Datasource\ConnectionManager;" in order to use this
+            
+            /*
+             * query VS execute VS prepare
+             * query    = will execute the SQL immediately  + cannot pass parameter
+             * execute  = will execute the SQL immediately  + can pass parameter
+             * prepare  = will execute the SQL later        + can pass parameter
+             *  *if using prepare, once all the parameter is set, execute the prepare using ->execute()
+             * newQuery = will execute the SQL later        + can pass parameter
+             */
+            
+            //query
+            if( FALSE){
+                $query = $connection->query("SELECT * FROM articles"); //will execute the SQL as SQL LOG from DebugKit
+                pr($query); //will return Cake\Database\Log\LoggingStatement Object
+                pj($query); //will return blank
+                
+                //to get raw data, use foreach
+//                foreach ($query as $row) { //you can only access the data using foreach. or maybe there is another way
+//                    pr($row); //please check the result quite weird
+//                }
+                
+                //git filtered data use fetch(...) or fetchAll(...)
+                $row = $query->fetch('assoc'); //'assoc'=return column name, blank=return array list
+                pr($row);
+                
+                $rows = $query->fetchAll('assoc');
+                pr($rows);
+            }
+            
+            //execute
+            if( FALSE){
+                $query = $connection->execute("SELECT * FROM articles WHERE id>= :article_id", [ //will execute the SQL as SQL LOG from DebugKit
+                    'article_id' => 2
+                ]);
+                
+                $rows = $query->fetchAll('assoc');
+                pr($rows);
+                
+                $rows = collection($rows); //seems like the raw sql does not collection supported by default (unlike ORM is default collection supported)
+                $data1 = $rows->extract('title');
+                pr($data1->toArray());
+            }
+            
+            //prepare
+            if( FALSE){
+                $query = $connection->prepare("SELECT * FROM articles WHERE id>= :article_id"); //will not execute the SQL until you do "$query->execute();"
+                $query->bindValue('article_id', 2, 'integer');
+                $query->execute();
+                
+                $rows = collection($query->fetchAll('assoc')); //seems like this way is much better
+                pr($rows->toArray());
+            }
+            
+            //new query
+            if( TRUE){
+                
+                $query = $connection //will not execute the SQL until you do "$query->execute();"
+                    ->newQuery()
+                    ->select('*')
+                    ->from('articles')
+                    ->where([
+                        'id >=' => 2
+                    ]);
+                $rows = collection($query->execute()->fetchAll('assoc')); //the way it handle using new query is little bit different, and collection still manual call
+                
+                pr($rows->toArray());
+                pr($rows->extract('title')->toArray());
+            }
+        }
+        
+        
+        //try to mix "ORM query builder" with "Database Basics"
+        if( 0){
+            $connection = ConnectionManager::get('default');
+            
+            $query = $connection
+                ->newQuery()
+                ->select('*')
+                ->from('articles');
+            pr($connection);
+            pr($query->execute());
+//            pr($query->execute()->fetchAll('assoc'));
+            pr($this->Articles->find());
+        }
+        
         
         
         /*$articles = TableRegistry::get('Articles'); //need to "use Cake\ORM\TableRegistry;" to use this
@@ -256,9 +545,12 @@ class ArticlesController extends AppController
         
         //Getting A List Of Values From A Column
         //https://book.cakephp.org/3.0/en/orm/query-builder.html#getting-a-list-of-values-from-a-column
-        $data1 = $this->Contacts->find()->extract('name');
-        pr($data1); //Return Collection-Iterator-ExtractIterator Object
-        pj($data1);
+        if( FALSE){
+            $data1 = $this->Contacts->find()->extract('name');
+            pr($data1); //Return Collection-Iterator-ExtractIterator Object
+            pj($data1);
+        }
+        
         
         
         //STOP AT: https://book.cakephp.org/3.0/en/orm/query-builder.html#getting-a-list-of-values-from-a-column

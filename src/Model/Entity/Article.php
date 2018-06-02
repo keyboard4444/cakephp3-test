@@ -7,9 +7,13 @@ use Cake\ORM\Entity;
 class Article extends Entity
 {
     protected $_accessible = [
+//        '*' => true,
+//        'id' => false,
+//        'slug' => false,
+        
         '*' => true,
-        'id' => false,
-        'slug' => false,
+        'title_slug' => true,
+        'abangkacak' => true
     ];
     
     
