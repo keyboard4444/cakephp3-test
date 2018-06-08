@@ -6,10 +6,43 @@ use Cake\Routing\Router;
 use Cake\ORM\TableRegistry;
 //use Cake\Collection\Collection;
 use Cake\Datasource\ConnectionManager;
+use PHPHtmlParser\Dom;
 
 class ArticlesController extends AppController
 {
-    
+    /*
+     * i want to download all top 100 song from 2010 until 2018
+     * get the list, get the download url from youtube, download it
+     */
+    public function domparser(){
+        
+        $dom = new Dom;
+        $dom->loadFromUrl('http://www.bobborst.com/popculture/top-100-songs-of-the-year/?year=2000');
+        
+        //$html = $a->outerHtml;
+        
+        //get the song table
+        $a = $dom->find(".songtable")[0];
+        
+        //get each table row
+        $b = $a->find("tbody tr");
+        //pr(count($b));
+        foreach($b as $key1 => $value1){
+            
+            $c = $value1->find("td");
+            $d = trim($c[1]->innerHtml.' '.$c[2]->innerHtml).' lyric';
+            //pr($d);
+        }
+        
+        $dom->loadFromUrl('https://www.youtube.com/results?search_query=Creed+Higher+lyric');
+        
+        $a = $dom->find("#video-title");
+        $html = $a->outerHtml;
+        
+        echo $html;
+        
+        $this->render(DS.'blank');
+    }
     
     
     /*
@@ -214,7 +247,7 @@ class ArticlesController extends AppController
             }
         }
             
-        if( 1) {
+        if( 0) {
             pr("============chunk"); //as per tutorial
             
             //as per tutorial
@@ -282,10 +315,115 @@ class ArticlesController extends AppController
                     pr($data2->chunkWithKeys(3)->toList()); //best result to preserve key
                 }
             }
-            
-            
-            //next thing to learn, https://book.cakephp.org/3.0/en/core-libraries/collections.html#filtering
         }
+            
+            
+        //Filtering https://book.cakephp.org/3.0/en/core-libraries/collections.html#filtering
+        if( 0){
+            pr("============FILTERS");
+            
+            $data1 = $this->Articles->find()->where([
+                'Articles.id >=' => 1
+            ]);
+
+            //some basic example
+            if( 0){
+                $data2 = $data1->filter(function ($articles, $key) {
+                
+                    //you can view the data here
+                    //pr($key);
+                    //pj($articles);
+
+                    //return false; //will return blank since all no match
+                    return true; //will return all because all TRUE=matched
+                });
+                pr("final results 1");
+                pr($data2->toArray());
+            }
+            
+            
+            //slightly complex example?
+            if( 1){
+                $data2 = $data1->filter(function ($articles, $key) {
+                
+                    $finally_return_as = false;
+
+                    if( $articles->id >= 3 && $articles->id <= 5){
+                        $finally_return_as = true;
+                    }
+
+                    return $finally_return_as;
+                });
+                pr("final results 2");
+                pr($data2->toArray());
+            }
+        }
+        
+        
+        //match, first match, every & some = lazy to do
+        
+        
+        //data aggregation, https://book.cakephp.org/3.0/en/core-libraries/collections.html#aggregation
+        if( 0){
+            pr("============aggregation");
+            
+            $data1 = $this->Contacts->find()->where([
+                'Contacts.id >=' => 1
+            ])
+            ->contain('Articles');
+//            pj($data1);
+            
+            //REDUCE, process the array into something summarized format (aka aggregation)
+            if( 0){
+                $data2 = $data1->reduce(function ($accumulated, $contact) {
+                    
+                    $accumulated['total'] += $contact->age;
+                    $accumulated['raw_data'][] = $contact->age;
+                    
+                    return $accumulated;
+                }, [
+                    'total' => 0,
+                    'raw_data' => []
+                ]);
+                pr("===reduced");
+                pj($data2);
+            }
+            
+            //MIN
+            if( 0){
+                $data2 = $data1->min('age'); //select the minimum age
+                pj($data2);
+            }
+            
+            //MAX
+            if( 0){
+                $data2 = $data1->max(function ($contacts) { //select the maximum age + using callback
+                    return $contacts->age;
+                });
+                pj($data2);
+            }
+            
+            //SUMOF
+            if( 0){
+                $data2 = $data1->sumOf('age'); //also can use sub
+                pj($data2);
+            }
+            
+            //AVERAGE
+            if( 0){
+                $data2 = $data1->avg('age'); //also can use sub
+                pj($data2);
+            }
+            
+            //MEDIAN
+            if( 1){
+                $data2 = $data1->median('age'); //also can use sub
+                pj($data2);
+            }
+        }
+        
+        
+        //next to continue: https://book.cakephp.org/3.0/en/core-libraries/collections.html#grouping-and-counting
 
 
         $this->render(DS.'blank');
