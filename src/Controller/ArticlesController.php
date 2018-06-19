@@ -1006,9 +1006,6 @@ class ArticlesController extends AppController
         $this->loadComponent('Paginator');
         $articles = $this->Paginator->paginate($this->Articles->find());
         $this->set(compact('articles'));
-        
-        
-        
     }
     
     

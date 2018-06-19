@@ -216,3 +216,6 @@ if (Configure::read('debug')) {
 }
 
 Plugin::load('ContactManager', ['bootstrap' => false, 'routes' => true]);
+
+//since helloworld will be replacing debug.log, if we dont do this any notice error will update both debug.log and helloworld.log which is redundant
+Log::drop('debug');

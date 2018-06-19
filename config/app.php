@@ -1,5 +1,37 @@
 <?php
+
+//STUDY CAKEPHP LOGGING https://book.cakephp.org/3.0/en/core-libraries/logging.html#logging-configuration
+use Cake\Log\Log;
+
+//use file logging: I want to capture mudane error
+Log::config('helloworld', [
+    'className' => 'File',
+    'path' => LOGS,
+    'levels' => ['notice', 'info', 'debug'],
+    'file' => 'helloworld',
+]);
+//Log::drop('debug'); <-- do this at bootstrap, here does not works
+
+//use database logging: I want to capture critical/important error
+//You need to create C:\laragon\www\cakephp3-test\src\Log\Engine\DatabaseLog.php first, only below can works
+Log::config('hellodb', [
+    'className' => 'Database',
+    'model' => 'LogEntry',
+    'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
+]);
+
+//Logging scope: want to configure different logging behavior for different subsystems or parts of your application
+//https://book.cakephp.org/3.0/en/core-libraries/logging.html#logging-scopes
+Log::config('gettodachoppa', [
+    'className' => 'File',
+    'path' => LOGS,
+    'levels' => ['notice', 'info', 'debug', 'warning', 'error', 'critical', 'alert', 'emergency'], //we absorb all kind of error
+    'scopes' => ['terminator'],
+    'file' => 'gettodachoppa',
+]);
+
 return [
+    
     /**
      * Debug Level:
      *
