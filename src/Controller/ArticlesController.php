@@ -423,7 +423,87 @@ class ArticlesController extends AppController
         }
         
         
-        //next to continue: https://book.cakephp.org/3.0/en/core-libraries/collections.html#grouping-and-counting
+        //Grouping and Counting https://book.cakephp.org/3.0/en/core-libraries/collections.html#grouping-and-counting
+        if( 1){
+            
+            pr("============Grouping and Counting");
+            
+//            $data1 = $this->Contacts->find()->where([
+//                'Contacts.id >=' => 1
+//            ])
+//            ->contain(['Articles', 'Users']);
+            
+            if(0){
+                $data1 = $this->Contacts->find()->where([
+                    'Contacts.id >=' => 1
+                ])
+                ->contain(['Users']);
+                
+                $data2 = $data1->groupBy('user_id');
+                pj($data2);
+            }
+            
+            if(0){
+                //if belongsTo you can use sub like user.id
+                $data1 = $this->Contacts->find()->where([
+                    'Contacts.id >=' => 1
+                ])
+                ->contain(['Users']);
+                
+                $data2 = $data1->groupBy('user.id');
+                pj($data2->toArray());
+            }
+            
+            if(0){
+                //but if hasMany, you cant sub
+                $data1 = $this->Articles->find()->where([
+                    'Articles.id >=' => 1
+                ]);
+                
+                $data2 = $data1->groupBy('rating');
+                pj($data2->toArray());
+                
+                $data2 = $data1->groupBy('user_id');
+                pj($data2->toArray());
+            }
+            
+            //example of using function
+            if(0){
+                $data1 = $this->Articles->find()->where([
+                    'Articles.id >=' => 1
+                ]);
+                
+                $data2 = $data1->groupBy(function ($data2_sub) {
+                    if( $data2_sub->rating >= 4){
+                        return 'good';
+                    }
+                    else {
+                        return 'bad'; //ps: if you did not return anything, it will be blank key
+                    }
+                });
+                pj($data2->toArray());
+            }
+            
+            //countBy
+            if(1){
+                $data1 = $this->Articles->find()->where([
+                    'Articles.id >=' => 1
+                ]);
+                
+                $data2 = $data1->countBy(function ($data2_sub) {
+                    if( $data2_sub->rating >= 4){
+                        return 'good';
+                    }
+                    else {
+                        return 'bad'; //ps: if you did not return anything, it will be blank key
+                    }
+                });
+                pj($data2->toArray());
+                
+                $data2 = $data1->countBy('rating');
+                pj($data2->toArray());
+            }
+        }
 
 
         $this->render(DS.'blank');
