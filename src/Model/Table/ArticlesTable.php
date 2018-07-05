@@ -24,4 +24,12 @@ class ArticlesTable extends Table
             'id >=' => 3
         ]);
     }
+    
+    public function findPublished(Query $query, array $options)
+    {
+        $query->where([
+            $this->alias() . '.published' => 1
+        ]);
+        return $query;
+    }
 }

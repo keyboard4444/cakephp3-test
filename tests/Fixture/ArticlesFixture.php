@@ -45,21 +45,27 @@ class ArticlesFixture extends TestFixture {
                 'body' => 'First Article Body',
                 'published' => '1',
                 'created' => '2007-03-18 10:39:23',
-                'modified' => '2007-03-18 10:41:31'
+                'modified' => '2007-03-18 10:41:31',
+                'user_id' => 1,
+                'slug' => 'first-article',
             ],
             [
                 'title' => 'Second Article',
                 'body' => 'Second Article Body',
-                'published' => '1',
+                'published' => '0',
                 'created' => '2007-03-18 10:41:23',
-                'modified' => '2007-03-18 10:43:31'
+                'modified' => '2007-03-18 10:43:31',
+                'user_id' => 2,
+                'slug' => 'seconds-article',
             ],
             [
                 'title' => 'Third Article',
                 'body' => 'Third Article Body',
                 'published' => '1',
                 'created' => '2007-03-18 10:43:23',
-                'modified' => '2007-03-18 10:45:31'
+                'modified' => '2007-03-18 10:45:31',
+                'user_id' => 1,
+                'slug' => 'third-article',
             ]
         ];
         parent::init();
