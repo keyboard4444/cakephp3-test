@@ -1,6 +1,5 @@
 vendor/
 tmp/
-tests/
 bin/
 logs/
 config/.env
