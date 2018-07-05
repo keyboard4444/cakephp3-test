@@ -63,7 +63,7 @@ Router::prefix('admin', function ($routes) {
  * 
  * Another example is lowercase + dashify
  */
-$routes->scope('/cooks', function ($routes) {
+Router::scope('/cooks', function ($routes) {
     
     $routes->setRouteClass(DashedRoute::class); //lowercased and dashed URLs when you generate the URL using html->link <-- this one not working or am i missing something?
     
@@ -149,7 +149,7 @@ Router::scope('/', function (RouteBuilder $routes) {
     /**
      * ...and connect the rest of 'Pages' controller's URLs.
      */
-//    $routes->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
+   $routes->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
 
     /**
      * Connect catchall routes for all controllers.

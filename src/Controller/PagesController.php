@@ -34,13 +34,13 @@ class PagesController extends AppController
     
     
     public function initialize(){
-        pr("initialize");
+        //pr("calling initialize"); //will be executed first
     }
     
     
     public function beforeFilter(Event $event){
         parent::beforeFilter($event);
-        pr("beforeFilter-PagesController");
+        //pr("calling beforeFilter-PagesController");
     }
     
     
