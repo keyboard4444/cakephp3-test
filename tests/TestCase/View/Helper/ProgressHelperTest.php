@@ -23,12 +23,14 @@ class ProgressHelperTest extends TestCase
     public function testLoadFixtureOntheFly()
     {
         $this->loadFixtures('Articles');
+        $this->markTestSkipped('Test skippado.');
     }
     
     public function testHello()
     {
         //this test will fail
         //$this->assertContains('HELLO', 'HI');
+        $this->markTestIncomplete('Not implemented yet.');
     }
 
     public function testBar()
